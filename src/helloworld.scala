@@ -4,7 +4,12 @@ package helloword
  */
 
 object HelloWorld {
+
+  def sayHello(name: String) = s"Hello, $name!"
+
   def main(args: Array[String]) {
     println("Hello world!")
+    println(sayHello("Brian"))
   }
+
 }
