@@ -1,6 +1,6 @@
 
 println("With our FP List")
-val l = FPGroup.List(1, 2, 3, 5)
+val l = chapter3.List(1, 2, 3, 5)
 println(l)
 
 println("tail")

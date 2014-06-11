@@ -1,7 +1,7 @@
-package basicfunctions
+
 
 /** Documentation comment. */
-object aModule {
+object chapter2 {
 
   def abs(n: Int): Int = {
     if (n < 0) -n

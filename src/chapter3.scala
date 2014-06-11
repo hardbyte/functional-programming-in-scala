@@ -1,4 +1,4 @@
-object FPGroup {
+object chapter3 {
 
   //
   // Chapter 3

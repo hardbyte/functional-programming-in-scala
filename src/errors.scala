@@ -70,10 +70,33 @@ object errors {
     m flatMap calcVar
   }
 
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = {
+    // map takes non option aware functions
+    a flatMap (someA => b map (someB => f(someA, someB)))
+  }
 
+  // Combine a list of Options into one option containing a list of all the
+  // Some values in the original list, or if any of the Options are None
+  // return None
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+      case Nil => Some(Nil)
+      // Return a Some(List(aa, ...rest of sequence))
+      case h :: t =>
+          h flatMap (hh => sequence(t) map (tt => hh :: tt))
+    }
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a match {
+      case Nil => Some(Nil)
+      case h::t => map2(f(h), traverse(t)(f))(_ :: _)
+    }
 
   def main(args: Array[String]) {
     println("Running the errors code")
+
+    val name: Option[String] = Some("Blah")
+    val upper = name map { _.trim } filter { _.length != 0 } map { _.toUpperCase }
+    println(upper getOrElse "")
 
     println("Passing in an array")
     println(option_mean(Seq(2.02, 0.2)))
@@ -84,6 +107,11 @@ object errors {
     println("Variance...")
     println(option_variance(Seq(2.03, 4.2)))
     println(option_variance(Seq()))
+
+    println("map2")
+    println(map2(Some(3), Some(4))((a, b) => a + b))
+
+    // lenses
   }
 }
 
