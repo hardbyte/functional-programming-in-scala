@@ -3,6 +3,7 @@ object chapter3 {
   //
   // Chapter 3
   //
+  // See the chapter3_worksheet for usage and testing
 
   sealed trait List[+A] {
     def tail(): List[A] = this match {
@@ -36,7 +37,6 @@ object chapter3 {
 
   }
 
-
   case object Nil extends List[Nothing] {}
   case class Cons[+A](h: A, t: List[A]) extends List[A]
 
@@ -59,11 +59,4 @@ object chapter3 {
     }
   }
 
-  // Main
-  def main(args: Array[String]): Unit = {
-
-
-
-    //println(l.setHead(11))
-  }
 }

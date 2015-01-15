@@ -1,18 +1,28 @@
 
-
 /** Documentation comment. */
+
+// import from a package...
+import hardbyte.arrayutil._
+
+
 object chapter2 {
 
+  /**
+   * Define a function called abs which
+   * is typed to take an Int (n) and return
+   * an Int
+   *
+   * @param n the value to absolute
+   */
   def abs(n: Int): Int = {
     if (n < 0) -n
     else n
   }
 
+  // The same but defined inline
   val abs2 = (n: Int) => if (n < 0) -n else n: Int
 
-  //def abs3 = ?
-
-
+  // A tail recursive function definition
   def factorial(n: Int): Int = {
     def go(n: Int, acc: Int): Int = {
       if (n <= 0) acc
@@ -22,6 +32,7 @@ object chapter2 {
   }
 
 
+  // Pattern matching
   def fib(n: Int): Int = n match {
     /**
      * Naive implementation
@@ -35,7 +46,7 @@ object chapter2 {
     case _ => fib(n - 1) + fib(n - 2)
   }
 
-  // tail recursion
+  // Tail recursive version
   def fib2(n: Int): Int = {
 
     def go(n: Int, nxt: Int, res: Int): Int = n match {
@@ -46,23 +57,8 @@ object chapter2 {
     go(n, 1, 0)
   }
 
-  /**
-   * @todo With memoization?
-   * @param n number to fib
-   * @return the fibbed result
-   */
-  //def fib3(n: Int): Int = {}
-
-
-  def isSorted[A](a: Array[A], cmp: (A, A) => Boolean): Boolean = a.length match{
-    case 0 => true
-    case 1 => true
-    case _ => cmp(a(0), a(1)) && isSorted(a.tail, cmp)
-
-  }
 
   def partial1[A, B, C](a: A, f: (A, B) => C): B => C = {
-
     def go(b: B): C = {
       f(a, b)
     }
@@ -95,9 +91,36 @@ object chapter2 {
     (a: A) => f(g(a))
 
 
-  def testPartial(): Unit = {
+  def testCurry(): Unit = {
+    println("Testing Curry")
+    def add2(a: Int, b: Int): Int = {
+      a + b
+    }
 
-    var as = Array(0, 3, 4, 5)
+    println("add2(3,4) = " + add2(3, 4))
+    val cadd2 = curry(add2)
+
+    println(cadd2(3)(4))
+
+    // Note now this doesn't work:
+    //println(cadd2(3,4))
+
+    val partialAdd3 = cadd2(3)
+    println("partialAdd3(4) = " + partialAdd3(4))
+
+
+    val ucadd2 = uncurry(cadd2)
+    println(ucadd2(3, 4))
+
+    // We can partially apply an argument with `_`:
+    val addConst2 = add2(2, _: Int)
+    println(addConst2(2))
+  }
+
+  def testPartial(): Unit = {
+    println("Testing partial")
+
+    val as = Array(0, 3, 4, 5)
     val cmp1: (Int, Int) => Boolean = (a: Int, b: Int) => a < b
 
     println(
@@ -105,7 +128,7 @@ object chapter2 {
     )
 
 
-    def add(a: Int, b: Int): Int= {
+    def add(a: Int, b: Int): Int = {
       a + b
     }
 
@@ -126,56 +149,48 @@ object chapter2 {
   }
 
   def main(args: Array[String]): Unit = {
-    //println(fib(6))
-    //println(fib(23))
-
-    //println(fib2(8))
+    println("fib(6) = " + fib(6))
 
     // Take argument from command line:
     //println(fib(args(0).toInt))
 
-    def add2(a: Int, b: Int): Int = {
-      a + b
-    }
+    testCurry()
+    testPartial()
 
     def add3(a: Int, b: Int, c: Int): Int = {
       a + b + c
     }
 
-    println(add2(3, 4))
-    val cadd2 = curry(add2)
-
-    println(cadd2(3)(4))
-
-    // Now this doesn't work:
-    //println(cadd2(3,4))
-
-    val ucadd2 = uncurry(cadd2)
-    println(ucadd2(3,4))
-
-    // We can partially apply an argument with `_`:
-    val addConst2 = add2(2, _:Int)
-    println(addConst2(2))
-
-    println(add3(3, 4, 1), 8)
-
+    println("Using the native partial method _")
     val fpAdder = add3 _
     println(fpAdder(1,1,0))
 
+    val fpAdder2 = add3(2, _:Int, _:Int)
+    println(fpAdder2(1,1))
 
-    println(mycompose(factorial, abs)(-8))
 
-    // Using scala's built in compose ???
-//    val composedFunction = factorial compose abs
-//    println(
-//      composedFunction(-15)
-//    )
+    println("compose(fact, abs)(-8) = " + mycompose(factorial, abs)(-8))
+
+    // Using scala's built in compose
+    val composedFunction = factorial _ compose abs
+    println(
+      "fact _ compose abs (-8) = " +
+      composedFunction(-8)
+    )
+
+    // Using scala's built in andThen
+    val composedFunction2 = abs _ andThen factorial
+
+    println(
+      "abs _ andThen fact (-8) = " +
+      composedFunction2(-8)
+    )
 
     val f = (x: Double) => math.Pi / 2 - x
-    val cos = f andThen math.sin
-    val cos2 = f compose math.sin
-    println(cos2(0.5))
-
+    val g = f andThen math.sin
+    val g2 = math.sin _ compose f
+    println(g(math.Pi))
+    println(g2(math.Pi))
   }
 
 }
